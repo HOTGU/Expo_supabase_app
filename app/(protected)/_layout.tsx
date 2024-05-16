@@ -1,5 +1,5 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { Redirect, Slot } from "expo-router";
+import { Redirect, Slot, Stack } from "expo-router";
 
 export default function ProtectedLayout() {
   const { user } = useAuth();
