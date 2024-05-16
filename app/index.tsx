@@ -6,11 +6,13 @@ import { StyleSheet, FlatList, Alert } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { Database } from "@/types/supabase";
+import { Poll } from "@/types/db";
 
 const polls = [1, 2, 3];
 
 export default function HomeScreen() {
-  const [polls, setPolls] = useState([]);
+  const [polls, setPolls] = useState<Poll[]>([]);
 
   useEffect(() => {
     const fetchPolls = async () => {
@@ -20,8 +22,9 @@ export default function HomeScreen() {
       if (error) {
         Alert.alert("Error fetching data");
       }
+
       console.log(data);
-      setPolls(data);
+      data ? setPolls(data) : setPolls([]);
     };
     fetchPolls();
   }, []);
@@ -34,6 +37,11 @@ export default function HomeScreen() {
           headerRight: () => (
             <Link href="/polls/new">
               <AntDesign name="plus" size={24} color="gray" />
+            </Link>
+          ),
+          headerLeft: () => (
+            <Link href="/profile">
+              <AntDesign name="user" size={24} color="gray" />
             </Link>
           ),
         }}

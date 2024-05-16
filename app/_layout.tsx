@@ -1,3 +1,4 @@
+import AuthProvider from "@/providers/AuthProvider";
 import {
   DarkTheme,
   DefaultTheme,
@@ -30,10 +31,12 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack
-      // screenOptions={{ headerStyle: { backgroundColor: "transparent" } }}
-      />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <Stack
+        // screenOptions={{ headerStyle: { backgroundColor: "transparent" } }}
+        />
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
