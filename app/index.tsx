@@ -23,7 +23,6 @@ export default function HomeScreen() {
         Alert.alert("Error fetching data");
       }
 
-      console.log(data);
       data ? setPolls(data) : setPolls([]);
     };
     fetchPolls();
@@ -50,7 +49,7 @@ export default function HomeScreen() {
         data={polls}
         contentContainerStyle={styles.container}
         renderItem={({ item }) => (
-          <ThemeLink href={`/polls/${item}`} key={item.id}>
+          <ThemeLink href={`/polls/${item.id}`} key={item.id}>
             <Feather />
             <ThemeText type="bold">{item.question}</ThemeText>
           </ThemeLink>
