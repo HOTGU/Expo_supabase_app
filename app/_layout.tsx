@@ -35,7 +35,6 @@ export default function RootLayout() {
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(auth)" options={{ title: "Login" }} />
-          {/* <Stack.Screen name="(protected)" options={{ title: false }} /> */}
         </Stack>
       </ThemeProvider>
     </AuthProvider>

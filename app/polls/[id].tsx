@@ -7,31 +7,52 @@ import {
   ViewBase,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Redirect, Stack, useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import ThemeText from "@/components/ThemeText";
 import ThemePressable from "@/components/ThemePress";
 import ThemeButton from "@/components/ThemeButton";
-import { Poll } from "@/types/db";
+import { Poll, Vote } from "@/types/db";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/providers/AuthProvider";
 
 const detail = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [poll, setPoll] = useState<Poll | null>(null);
   const [selected, setSelected] = useState("");
+  const [userVote, setUserVote] = useState<Vote | null>(null);
+  const { user } = useAuth();
+
+  if (!user) return <Redirect href="/login" />;
 
   if (!id) {
     return <ActivityIndicator />;
   }
 
-  const vote = () => {
-    console.warn("hello");
+  const vote = async () => {
+    const newVote = {
+      option: selected,
+      poll_id: poll?.id,
+      user_id: user.id,
+    };
+    if (userVote) {
+      newVote.id = userVote.id;
+    }
+    const { data, error } = await supabase
+      .from("votes")
+      .upsert(newVote)
+      .select()
+      .single();
+    if (error) {
+      Alert.alert("Failed to vote");
+      return;
+    }
+    setUserVote(data);
+    Alert.alert("Thank you for your vote");
   };
 
   useEffect(() => {
-    const fetchPoll = async () => {
-      console.log("Fetching polls...");
-
+    const fetchPolls = async () => {
       let { data, error } = await supabase
         .from("polls")
         .select("*")
@@ -39,15 +60,33 @@ const detail = () => {
         .single();
       if (error) {
         Alert.alert("Error fetching data");
-        console.log(error);
       }
-
-      data ? setPoll(data) : setPoll(null);
+      setPoll(data);
     };
-    fetchPoll();
-  }, []);
 
+    const fetchUserVote = async () => {
+      if (!user) {
+        return;
+      }
+      let { data, error } = await supabase
+        .from("votes")
+        .select("*")
+        .eq("poll_id", Number.parseInt(id))
+        .eq("user_id", user.id)
+        .limit(1)
+        .single();
+
+      setUserVote(data);
+      if (data) {
+        setSelected(data.option);
+      }
+    };
+
+    fetchPolls();
+    fetchUserVote();
+  }, []);
   if (!poll) return <ActivityIndicator />;
+
   return (
     <View style={{ padding: 10 }}>
       <Stack.Screen
